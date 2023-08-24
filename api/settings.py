@@ -6,11 +6,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+DEBUG = True
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-*qrg(-oum-77+8a=omddo)!)wb%z$j$66qdw@%52#_jfh*3jp0"
-DEBUG = True
 ALLOWED_HOSTS = [".vercel.app", ".now.sh", "*"]
 
 JWT_AUTH = {
@@ -45,6 +45,7 @@ AUTH_USER_MODEL = "user.CustomUser"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "corsheaders.middleware.CorsMiddleware",
@@ -127,6 +128,8 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static_files")]
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
