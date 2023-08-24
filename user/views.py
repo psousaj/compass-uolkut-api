@@ -137,7 +137,7 @@ class ProfileView(viewsets.ModelViewSet):
             data_to_serialize = {
                 "name": request.data.get("name"),
                 "birth": request.data.get("birth"),
-                "profession": request.data.get("profissao"),
+                "profession": request.data.get("profession"),
                 "country": request.data.get("country"),
                 "city": request.data.get("city"),
                 "relationship": request.data.get("relationship"),

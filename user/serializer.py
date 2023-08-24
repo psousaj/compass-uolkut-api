@@ -50,6 +50,6 @@ class MyTokenPairSerializer(TokenObtainPairSerializer):
         token = super().get_token(user)
 
         # Add custom claims
-        token["profile"] = profile
+        token["profile"] = profile.data
 
         return token
