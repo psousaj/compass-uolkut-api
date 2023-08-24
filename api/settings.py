@@ -13,8 +13,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-*qrg(-oum-77+8a=omddo)!)wb%z$j$66qdw@%52#_jfh*3jp0"
 ALLOWED_HOSTS = [".vercel.app", ".now.sh", "*"]
 
-JWT_AUTH = {
-    "JWT_EXPIRATION_DELTA": datetime.timedelta(seconds=86400),
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=5),
+    "UPDATE_LAST_LOGIN": True,
 }
 
 
