@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from rest_framework import generics, permissions, viewsets
 from rest_framework.response import Response
 
@@ -10,7 +11,7 @@ def validate_user_already_exists(email):
     if user.exists():
         return user.first()
 
-    return None
+    return False
 
 
 # Create your views here.
@@ -58,10 +59,12 @@ class UserView(generics.ListAPIView):
 
     def patch(self, request):
         user_id = request.query_params.get("id")
-        if not user_id:
-            raise Exception("Informe o id usuario!")
+
         try:
-            user = CustomUser.objects.get(id=user_id)
+            if user_id:
+                user = CustomUser.objects.get(id=user_id)
+            else:
+                user = CustomUser.objects.get(id=request.user.id)
         except Exception as e:
             return Response(
                 {"message": "Usuário inválido", "error": f"{str(e)}"}, status=400
@@ -110,31 +113,41 @@ class ProfileView(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        email = request.data.get("email")
-        user = validate_user_already_exists(email)
-        if not user:
-            try:
-                user = CustomUser.objects.create_user(
-                    email=email, password=request.data.get("password")
-                )
-                user.save()
-            except ValueError as e:
-                return Response({"message": "Algo deu errado! :(", "error": str(e)})
+        try:
+            email = request.data.get("email")
+            password = request.data.get("password")  # Recupere a senha do request
+            user, created = CustomUser.objects.get_or_create(email=email)
 
-        # Crie um dicionário com os dados a serem passados para o serializador
-        data_to_serialize = {
-            "nome": request.data.get("nome"),
-            "nascimento": request.data.get("nascimento"),
-            "profissao": request.data.get("profissao"),
-            "pais": request.data.get("pais"),
-            "cidade": request.data.get("cidade"),
-            "estado_civil": request.data.get("estado_civil"),
-            "user": user.id,
-        }
+            if created:
+                user.set_password(password)  # Defina a senha para o novo usuário
+                user.save()  # Salve o usuário com a senha
 
-        serializer = self.get_serializer(data=data_to_serialize)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
+            # Crie um dicionário com os dados a serem passados para o serializador
+            data_to_serialize = {
+                "name": request.data.get("name"),
+                "birth": request.data.get("birth"),
+                "profession": request.data.get("profissao"),
+                "country": request.data.get("country"),
+                "city": request.data.get("city"),
+                "relationship": request.data.get("relationship"),
+            }
+
+            serializer = self.get_serializer(data=data_to_serialize)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+
+            # Associe o perfil ao usuário usando o método set_user_profile
+            profile_instance = serializer.instance
+            profile_instance.set_user_profile(user)
+        except IntegrityError as e:
+            return Response(
+                {
+                    "message": "Algo deu errado! :(",
+                    "hint": "Esse usuario já tem um perfil atrelado a ele! Use outro email",
+                    "error": f"{str(e)}",
+                }
+            )
+
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=201, headers=headers)
 

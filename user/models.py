@@ -44,15 +44,28 @@ class Profile(models.Model):
         ("divorciado", "Divorciado"),
         ("preocupado", "Preocupado"),
     ]
-    nome = models.CharField(max_length=100, blank=True)
-    nascimento = models.DateField(default=None)
-    profissao = models.CharField(max_length=100, blank=True)
-    pais = models.CharField(max_length=100, default="Brasil")
-    cidade = models.CharField(max_length=100, default="Juazeiro do Norte")
-    estado_civil = models.CharField(
+    name = models.CharField(max_length=100, blank=True)
+    birth = models.DateField(default=None)
+    profession = models.CharField(max_length=100, blank=True)
+    country = models.CharField(max_length=100, default="Brasil")
+    city = models.CharField(max_length=100, default="Juazeiro do Norte")
+    relationship = models.CharField(
         max_length=20, choices=ESTADO_CIVIL_CHOICES, default=None
     )
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=False)
+    user = models.OneToOneField(
+        CustomUser,
+        related_name="user_profile",
+        on_delete=models.CASCADE,
+        null=True,
+        unique=True,
+    )
+
+    class Meta:
+        unique_together = ("name", "birth", "profession", "city", "relationship")
+
+    def set_user_profile(self, user_instance):
+        self.user = user_instance
+        self.save()
 
     def __str__(self):
-        return self.nome
+        return f"{self.name} - {self.user}"
