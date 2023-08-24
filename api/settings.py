@@ -2,6 +2,11 @@ import datetime
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-*qrg(-oum-77+8a=omddo)!)wb%z$j$66qdw@%52#_jfh*3jp0"
@@ -76,7 +81,7 @@ WSGI_APPLICATION = "api.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "uolkut",
+        "NAME": os.environ.get("DATABASE", os.getenv("DATABASE")),
         "USER": os.environ.get("DB_USER", os.getenv("DB_USER")),
         "PASSWORD": os.environ.get("DB_PASS", os.getenv("DB_PASS")),
         "HOST": os.environ.get("DB_HOST", os.getenv("DB_HOST")),
