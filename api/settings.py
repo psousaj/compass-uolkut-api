@@ -16,6 +16,7 @@ ALLOWED_HOSTS = [".vercel.app", ".now.sh", "*"]
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": datetime.timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=5),
+    "TOKEN_OBTAIN_SERIALIZER": "user.serializer.MyTokenPairSerializer",
     "UPDATE_LAST_LOGIN": True,
 }
 

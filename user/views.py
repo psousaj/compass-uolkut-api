@@ -101,6 +101,17 @@ class ProfileView(viewsets.ModelViewSet):
 
         return queryset
 
+    def listUser(self, request, *args, **kwargs):
+        try:
+            queryset = Profile.objects.get(user=request.user.id)
+        except ValueError as e:
+            return Response(
+                {"message": "Algo deu errado! :(", "error": str(e)}, status=200
+            )
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     def list(self, request, *args, **kwargs):
         try:
             queryset = self.filter_queryset(self.get_queryset())
